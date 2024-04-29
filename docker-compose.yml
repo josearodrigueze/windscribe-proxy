@@ -1,0 +1,28 @@
+version: '3.6'
+
+
+services:
+  curl_test:
+    image: byrnedo/alpine-curl
+    container_name: curl_test
+    command: -x windscribe_proxy:8118 -sSL https://api.surfshark.com/v1/server/user
+    depends_on:
+      - windscribe_proxy
+    restart: always
+
+  windscribe_proxy:
+    #    image: wiorca/docker-windscribe
+    build: .
+    container_name: windscribe_proxy
+    ports:
+      - "8118:8118"
+    env_file:
+      - .env
+    environment:
+      - WINDSCRIBE_PROTOCOL=stealth
+      - WINDSCRIBE_LOCATION=US
+      - WINDSCRIBE_LANBYPASS=on
+      - WINDSCRIBE_FIREWALL=on
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped

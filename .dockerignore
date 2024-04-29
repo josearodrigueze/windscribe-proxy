@@ -1,0 +1,10 @@
+.idea/
+.github/
+.dockerignore
+.env
+.gitignore
+ecr_push.sh
+docker-compose.yml
+Dockerfile
+Jenkinsfile
+README.md
