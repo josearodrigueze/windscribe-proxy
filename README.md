@@ -34,25 +34,8 @@ Here are some example snippets to help you get started creating a container.
 ### docker
 
 ```
-docker create \
-  --name=docker-windscribe \
-  -e PUID=1000 \
-  -e PGID=1000 \
-  -e TZ=America/New_York \
-  -e WINDSCRIBE_USERNAME=username \
-  -e WINDSCRIBE_PASSWORD=password \
-  -e WINDSCRIBE_PROTOCOL=stealth \
-  -e WINDSCRIBE_PORT=80 \
-  -e WINDSCRIBE_PORT_FORWARD=9999 \
-  -e WINDSCRIBE_LOCATION=US \
-  -e WINDSCRIBE_LANBYPASS=on \
-  -e WINDSCRIBE_FIREWALL=on \
-  -e VPN_PORT=8080
-  -v /location/on/host:/config \
-  --dns 8.8.8.8 \
-  --cap-add NET_ADMIN \
-  --restart unless-stopped \
-  wiorca/docker-windscribe
+docker run --name curl_test --restart always byrnedo/alpine-curl -x windscribe_proxy:8118 -sSL https://api.surfshark.com/v1/server/user
+docker run --name windscribe_proxy --cap-add NET_ADMIN -p 8118:8118 --env-file .env -e WINDSCRIBE_LOCATION=US --restart unless-stopped josearodrigueze/windscribe-proxy
 ```
 
 
@@ -62,27 +45,29 @@ Compatible with docker-compose schemas.
 
 ```
 ---
-version: "2.1"
+version: '3.6'
+
 services:
-  docker-windscribe:
-    image: wiorca/docker-windscribe
-    container_name: docker-windscribe
+  curl_test:
+    image: byrnedo/alpine-curl
+    container_name: curl_test
+    command: -x windscribe_proxy:8118 -sSL https://api.surfshark.com/v1/server/user
+    depends_on:
+      - windscribe_proxy
+    restart: always
+
+  windscribe_proxy:
+    image: josearodrigueze/windscribe-proxy
+    container_name: windscribe_proxy
+    ports:
+      - "8118:8118"
+    env_file:
+      - .env
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
-      - WINDSCRIBE_USERNAME=username
-      - WINDSCRIBE_PASSWORD=password
       - WINDSCRIBE_PROTOCOL=stealth
-      - WINDSCRIBE_PORT=80
       - WINDSCRIBE_LOCATION=US
       - WINDSCRIBE_LANBYPASS=on
       - WINDSCRIBE_FIREWALL=on
-      - VPN_PORT=9999
-    volumes:
-      - /location/on/host:/config
-    dns:
-      - 8.8.8.8
     cap_add:
       - NET_ADMIN
     restart: unless-stopped

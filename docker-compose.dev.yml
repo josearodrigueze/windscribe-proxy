@@ -10,14 +10,14 @@ services:
     restart: always
 
   windscribe_proxy:
-    image: josearodrigueze/windscribe-proxy
+    build: .
     container_name: windscribe_proxy
-    cap_add:
-      - NET_ADMIN
     ports:
       - "8118:8118"
     env_file:
       - .env
     environment:
       - WINDSCRIBE_LOCATION=US
+    cap_add:
+      - NET_ADMIN
     restart: unless-stopped

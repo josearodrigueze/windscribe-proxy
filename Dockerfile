@@ -1,4 +1,9 @@
-FROM --platform=linux/amd64 wiorca/docker-windscribe
+FROM wiorca/docker-windscribe
+
+LABEL maintainer.name="Jose Rodriguez" \
+    maintainer.email="josearodrigueze@gmail.com" \
+    version="1.0" \
+    description="Windscribe with proxy http"
 
 RUN apt-get update \
     && apt-get -qqq install -y \
